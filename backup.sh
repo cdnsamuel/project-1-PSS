@@ -21,12 +21,16 @@ message()
 }
 message
 
+add_source()
+{
+	echo "j'ajoute une source"
+}
 
 while [[ $running = '1' ]]  
 do
 	case $task in
 		1)
-			echo "1" 
+			add_source
 			running=0
 			;;
 		2)
@@ -53,7 +57,6 @@ do
 			echo "Selection invalide"
 			running=1
 			message
-			 
 			;;
 	esac
 done
