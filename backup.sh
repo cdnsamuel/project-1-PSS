@@ -175,7 +175,7 @@ read_option()
 		4) launch_backup ;;
 		5) edit_cron ;;
 		6) echo "Arret de script" ; exit 0 ;;
-		*) echo "Selection invalide"
+		*) echo "Selection invalide"; pause
 	esac
 }
 
