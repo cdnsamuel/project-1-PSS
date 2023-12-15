@@ -137,9 +137,19 @@ edit_destination()
 				echo "Le dossier $new_destination n'a pas été ajouté"
 				pause
 			esac
-		else
-			echo "Annulation, $new_source n'est pas un dossier"
-			pause
+		else	
+			read -p " Le dossier n'existe pas, voulez-vous le créer : y/n " test
+			if [ "$test" = "y" ] || [ "$test" = "Y" ]; then
+				mkdir -p $new_destination
+				echo " le dossier est créé "
+				echo "$new_destination" > destination.list
+				pause
+			else
+				echo "Annulation, $new_destination n'est pas un dossier"
+				pause
+			fi
+
+			
 		fi
 	fi
 }
