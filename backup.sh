@@ -87,18 +87,24 @@ del_source()
 	echo "Suppression de source sélectionné"
 	pause
 	read -p "Entrez le chemin à enlever : " source
-	if grep -q "$source" folder.list
+	if grep -q "$source$" folder.list
 	then
 		read -p "Voulez vous enlever $source de vos dossier à sauvegarder : Y/N " validation
 		case $validation in
 		[Yy]* )
-			grep -v "$source" folder.list > tmpfile && mv tmpfile folder.list || cp /dev/null folder.list && rm tmpfile
-			if [ $? ] 
+			if [ $(wc -l < folder.list) -eq 1 ]
 			then
-				echo "Le dossier $source à bien été enlevé"
-				pause
+				cp /dev/null folder.list
 			else
+				grep -v "$source$" folder.list > tmpfile && mv tmpfile folder.list
+			fi
+			if [ $? -ne 0 ] 
+			then
 				echo "Erreur lors de la supression du dossier $source"
+				pause
+
+			else
+				echo "Le dossier $source à bien été enlevé"
 				pause
 			fi
 		;;
