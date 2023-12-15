@@ -44,15 +44,31 @@ show_destination()
 # Afficher le menu 
 show_menu()
 {	
-	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	echo "🎛️  Menu Principal"
-	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	echo "1) Ajouter une source de sauvegarde"
-	echo "2) Supprimer une source de sauvegarde"
-	echo "3) Modifier la destination de sauvegarde"
-	echo "4) Lancer la sauvegarde "
-	echo "5) Plannifier la sauvegarde"
-	echo "6) Quitter"
+	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+	echo -n "          "
+	echo -e '\E[37;44m'"\033[1m              Menu Principal            \033[0m"
+	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+	echo; echo
+	echo -en '\E[67;34m'"\033[1m1) Ajouter une source de sauvegarde\033[0m"
+	echo; echo
+	echo -en '\E[67;36m'"\033[1m2) Supprimer une source de sauvegarde\033[0m"
+	echo; echo
+	echo -en '\E[67;34m'"\033[1m3) Modifier la destination de sauvegarde\033[0m"
+	echo; echo
+	echo -en '\E[67;34m'"\033[1m4) Lancer la sauvegarde\033[0m"
+	echo; echo
+	echo -en '\E[67;34m'"\033[1m5) Plannifier la sauvegarde\033[0m"
+	echo; echo
+	echo -en '\E[67;34m'"\033[1m6) Quitter\033[0m"
+	echo; echo
+	
+	#echo "1) Ajouter une source de sauvegarde"
+	
+	#echo "2) Supprimer une source de sauvegarde"
+	#echo "3) Modifier la destination de sauvegarde"
+	#echo "4) Lancer la sauvegarde "
+	#echo "5) Plannifier la sauvegarde"
+	#echo "6) Quitter"
 	
 }
 
@@ -60,6 +76,7 @@ show_menu()
 add_source()
 {	
 	echo "Ajout de source sélectionné"
+	
 	pause
 	read -p "Entrez le chemin à ajouter : " new_source
 	if [ -d $new_source ]
