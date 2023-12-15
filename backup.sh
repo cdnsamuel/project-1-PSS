@@ -123,14 +123,16 @@ edit_destination()
 {
 	echo "Ajout de la destination"
 	pause
-	read -p "Entrez le chemin de la destination : " new_destination
-	if [ -z $new_destination ]
+	echo  "Entrez le chemin de la destination"
+	read -p "(Pour supprimer valider sans entrer de valeur) : " new_destination
+
+	if [ -z "$new_destination" ]
 	then
 		echo "Suppression de la destination de sauvegarde"
 		cp /dev/null destination.list
 		pause
 	else
-		if [ -d $new_destination ]
+		if [ -d "$new_destination" ]
 		then
 			read -p "Voulez vous que $new_destination devienne votre chemin de sauvegarde : Y/N " validation
 			case $validation in
@@ -146,7 +148,7 @@ edit_destination()
 		else	
 			read -p " Le dossier n'existe pas, voulez-vous le créer : y/n " test
 			if [ "$test" = "y" ] || [ "$test" = "Y" ]; then
-				mkdir -p $new_destination
+				mkdir -p "$new_destination"
 				echo " le dossier est créé "
 				echo "$new_destination" > destination.list
 				pause
