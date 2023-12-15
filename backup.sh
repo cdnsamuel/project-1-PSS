@@ -161,7 +161,29 @@ launch_backup()
 # Changer la plannification
 edit_cron()
 {
-	echo "édition de la planification"
+
+    echo "Veuillez spécifier la fréquence des sauvegardes (quotidien/hebdomadaire) :"
+    read frequency
+
+    if [ "$frequency" != "quotidien" ] && [ "$frequency" != "hebdomadaire" ]; then
+        echo "Erreur : Fréquence invalide. Choisissez 'quotidien' ou 'hebdomadaire'."
+        return
+    fi
+
+    echo "Veuillez spécifier l'heure de la sauvegarde (format 24 heures, ex. 02:30) :"
+    read cron_time
+
+    cron_command="$cron_time * *"
+    if [ "$frequency" == "quotidien" ]; then
+        cron_command="$cron_command *"
+    elif [ "$frequency" == "hebdomadaire" ]; then
+        echo "Veuillez spécifier le jour de la semaine pour la sauvegarde (0-6, où 0=dimanche, 1=lundi, ..., 6=samedi) :"
+        read day_of_week
+        cron_command="$cron_command $day_of_week"
+    fi
+
+    (crontab -l ; echo "$cron_command $0 backup_now") | crontab -
+    echo "Tâche cron ajoutée avec succès."
 }
 
 # Lire la sélection
