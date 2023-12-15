@@ -104,18 +104,24 @@ del_source()
 	echo "Suppression de source sélectionné"
 	pause
 	read -p "Entrez le chemin à enlever : " source
-	if grep -q "$source" folder.list
+	if grep -q "$source$" folder.list
 	then
 		read -p "Voulez vous enlever $source de vos dossier à sauvegarder : Y/N " validation
 		case $validation in
 		[Yy]* )
-			grep -v "$source" folder.list > tmpfile && mv tmpfile folder.list || cp /dev/null folder.list && rm tmpfile
-			if [ $? ] 
+			if [ $(wc -l < folder.list) -eq 1 ]
 			then
-				echo "Le dossier $source à bien été enlevé"
-				pause
+				cp /dev/null folder.list
 			else
+				grep -v "$source$" folder.list > tmpfile && mv tmpfile folder.list
+			fi
+			if [ $? -ne 0 ] 
+			then
 				echo "Erreur lors de la supression du dossier $source"
+				pause
+
+			else
+				echo "Le dossier $source à bien été enlevé"
 				pause
 			fi
 		;;
@@ -134,14 +140,16 @@ edit_destination()
 {
 	echo "Ajout de la destination"
 	pause
-	read -p "Entrez le chemin de la destination : " new_destination
-	if [ -z $new_destination ]
+	echo  "Entrez le chemin de la destination"
+	read -p "(Pour supprimer valider sans entrer de valeur) : " new_destination
+
+	if [ -z "$new_destination" ]
 	then
 		echo "Suppression de la destination de sauvegarde"
 		cp /dev/null destination.list
 		pause
 	else
-		if [ -d $new_destination ]
+		if [ -d "$new_destination" ]
 		then
 			read -p "Voulez vous que $new_destination devienne votre chemin de sauvegarde : Y/N " validation
 			case $validation in
@@ -157,7 +165,7 @@ edit_destination()
 		else	
 			read -p " Le dossier n'existe pas, voulez-vous le créer : y/n " test
 			if [ "$test" = "y" ] || [ "$test" = "Y" ]; then
-				mkdir -p $new_destination
+				mkdir -p "$new_destination"
 				echo " le dossier est créé "
 				echo "$new_destination" > destination.list
 				pause
