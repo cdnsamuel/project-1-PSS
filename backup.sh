@@ -54,7 +54,7 @@ add_source()
 	read -p "Voulez vous rajouter $new_source à vos dossier à sauvegarder : Y/N " validation
 	case $validation in
 	[Yy]* )
-		echo "$new_source" >>. folder.list
+		echo "$new_source" >> folder.list
 		echo "Le dossier $new_source à bien été ajouté"
 		pause
 	;;
