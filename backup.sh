@@ -67,8 +67,9 @@ add_source()
 		read -p "Voulez vous rajouter $new_source à vos dossier à sauvegarder : Y/N " validation
 		case $validation in
 		[Yy]* )
-			echo "$new_source" >> folder.list
-			echo "Le dossier $new_source à bien été ajouté"
+			absolute_new_source=$(realpath $new_source)
+			echo "$absolute_new_source" >> folder.list
+			echo "Le dossier $absolute_new_source à bien été ajouté"
 			pause
 		;;
 		* )
@@ -135,8 +136,9 @@ edit_destination()
 			read -p "Voulez vous que $new_destination devienne votre chemin de sauvegarde : Y/N " validation
 			case $validation in
 			[Yy]* )
-				echo "$new_destination" > destination.list
-				echo "Le dossier $new_destination à bien été ajouté"
+				absolute_new_destination=$(realpath $new_destination)
+				echo "$absolute_new_destination" > destination.list
+				echo "Le dossier $absolute_new_destination à bien été ajouté"
 				pause
 			;;
 			* )
@@ -165,7 +167,29 @@ launch_backup()
 {	
 	if [ -s folder.list -a -s destination.list ]
 	then
-		echo "Début de la sauvegarde"
+		conflict=0
+		absolute_destination_path=$(realpath $(cat destination.list))
+		for source in $(cat folder.list)
+		do
+			if [[ $absolute_destination_path == *$source* ]]
+			then
+				conflict=1
+				echo "$absolute_destination_path est dans une source veuiller modifier les chemins"
+			fi
+		done
+
+		if [ $conflict -eq 0 ]
+		then 
+			timestamp=$(date +%Y%m%d-%H%M%S)
+			backup_destination=$absolute_destination_path/BKP-$timestamp
+			echo "Début de la sauvegarde $timestamp"
+			mkdir $backup_destination
+			for source in $(cat folder.list)
+			do
+				folder=$(basename $source)
+				tar -czf $backup_destination/$folder.tgz $source && printf "Sauvegarde terminée\n" || printf "Erreur lors de la sauvegarde\n"
+			done
+		fi
 		pause
 	else
 		if [ ! -s folder.list ]; then echo "Aucune source définie"; fi
@@ -190,7 +214,7 @@ read_option()
 		3) edit_destination ;;
 		4) launch_backup ;;
 		5) edit_cron ;;
-		6) echo "Arret de script" ; exit 0 ;;
+		6) echo "Arret du script de sauvegarde" ; exit 0 ;;
 		*) echo "Selection invalide"; pause
 	esac
 }
