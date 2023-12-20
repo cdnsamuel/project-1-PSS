@@ -84,37 +84,50 @@ add_source()
 # Supprimer une entrée à folder.list
 del_source()
 {
-	echo "Suppression de source sélectionné"
-	read -p "Entrez le chemin à enlever : " source
-	if grep -q "$source$" folder.list
-	then
-		read -p "Voulez vous enlever $source de vos dossier à sauvegarder : Y/N " validation
-		case $validation in
-		[Yy]* )
-			if [ $(wc -l < folder.list) -eq 1 ]
-			then
-				cp /dev/null folder.list
-			else
-				grep -v "$source$" folder.list > tmpfile && mv tmpfile folder.list
-			fi
-			if [ $? -ne 0 ] 
-			then
-				echo "Erreur lors de la supression du dossier $source"
-				pause
+	echo "Suppression de source sélectionné"	
+	PS3="Choisissez une option : "
 
-			else
-				echo "Le dossier $source à bien été enlevé"
-				pause
-			fi
-		;;
-		* )
-			echo "Annulation, Le dossier $source n'a pas été enlevé"
+	items=($(cat folder.list))
+	lines=$(wc -l < folder.list)
+	select item in "${items[@]}" Annuler
+	do
+		if [ "$REPLY" = $((${#items[@]}+1)) ]
+		then
+			echo "Annulation de la suppresion"
 			pause
-		esac
-	else
-		echo "$source n'est pas dans la liste des sources de sauvegardes"
-		pause
-	fi
+			break
+		elif (( "$REPLY" > 0 && "$REPLY" <= lines ))
+		then
+			read -p "Voulez vous enlever $item : Y/N " validation
+			case $validation in
+			[Yy]* )
+				if [ $(wc -l < folder.list) -eq 1 ]
+				then
+					cp /dev/null folder.list
+				else
+					grep -v "$item$" folder.list > tmpfile && mv tmpfile folder.list
+				fi
+				if [ $? -ne 0 ] 
+				then
+					echo "Erreur lors de la supression du dossier $item"
+					pause
+
+				else
+					echo "Le dossier $item à bien été enlevé"
+					pause
+				fi
+				;;
+			* )
+				echo "Annulation, Le dossier $item n'a pas été enlevé"
+				pause
+			esac
+			break
+		else
+			echo "Choix invalide"
+			pause
+			break
+		fi
+	done
 }
 
 # Editer la destination de sauvegarde
