@@ -84,50 +84,56 @@ add_source()
 # Supprimer une entrée à folder.list
 del_source()
 {
-	echo "Suppression de source sélectionné"	
-	PS3="Choisissez une option : "
+	if [ -s folder.list ]
+	then
+		echo "Suppression de source sélectionné"	
+		PS3="Choisissez une option : "
 
-	items=($(cat folder.list))
-	lines=$(wc -l < folder.list)
-	select item in "${items[@]}" Annuler
-	do
-		if [ "$REPLY" = $((${#items[@]}+1)) ]
-		then
-			echo "Annulation de la suppresion"
-			pause
-			break
-		elif (( "$REPLY" > 0 && "$REPLY" <= lines ))
-		then
-			read -p "Voulez vous enlever $item : Y/N " validation
-			case $validation in
-			[Yy]* )
-				if [ $(wc -l < folder.list) -eq 1 ]
-				then
-					cp /dev/null folder.list
-				else
-					grep -v "$item$" folder.list > tmpfile && mv tmpfile folder.list
-				fi
-				if [ $? -ne 0 ] 
-				then
-					echo "Erreur lors de la supression du dossier $item"
-					pause
-
-				else
-					echo "Le dossier $item à bien été enlevé"
-					pause
-				fi
-				;;
-			* )
-				echo "Annulation, Le dossier $item n'a pas été enlevé"
+		items=($(cat folder.list))
+		lines=$(wc -l < folder.list)
+		select item in "${items[@]}" Annuler
+		do
+			if [ "$REPLY" = $((${#items[@]}+1)) ]
+			then
+				echo "Annulation de la suppresion"
 				pause
-			esac
-			break
-		else
-			echo "Choix invalide"
-			pause
-			break
-		fi
-	done
+				break
+			elif (( "$REPLY" > 0 && "$REPLY" <= lines ))
+			then
+				read -p "Voulez vous enlever $item : Y/N " validation
+				case $validation in
+				[Yy]* )
+					if [ $(wc -l < folder.list) -eq 1 ]
+					then
+						cp /dev/null folder.list
+					else
+						grep -v "$item$" folder.list > tmpfile && mv tmpfile folder.list
+					fi
+					if [ $? -ne 0 ] 
+					then
+						echo "Erreur lors de la supression du dossier $item"
+						pause
+
+					else
+						echo "Le dossier $item à bien été enlevé"
+						pause
+					fi
+					;;
+				* )
+					echo "Annulation, Le dossier $item n'a pas été enlevé"
+					pause
+				esac
+				break
+			else
+				echo "Choix invalide"
+				pause
+				break
+			fi
+		done
+	else
+		echo "Aucune source à supprimer"
+		pause
+	fi
 }
 
 # Editer la destination de sauvegarde
