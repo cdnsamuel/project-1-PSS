@@ -60,7 +60,6 @@ show_menu()
 add_source()
 {	
 	echo "Ajout de source sélectionné"
-	pause
 	read -p "Entrez le chemin à ajouter : " new_source
 	if [ -d $new_source ]
 	then
@@ -86,7 +85,6 @@ add_source()
 del_source()
 {
 	echo "Suppression de source sélectionné"
-	pause
 	read -p "Entrez le chemin à enlever : " source
 	if grep -q "$source$" folder.list
 	then
@@ -123,7 +121,6 @@ del_source()
 edit_destination()
 {
 	echo "Ajout de la destination"
-	pause
 	echo  "Entrez le chemin de la destination"
 	read -p "(Pour supprimer valider sans entrer de valeur) : " new_destination
 
@@ -167,6 +164,7 @@ edit_destination()
 # Effectuer la sauvegarde
 launch_backup()
 {	
+	echo Initialisation de la sauvegarde
 	if [ -s folder.list -a -s destination.list ]
 	then
 		conflict=0
