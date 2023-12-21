@@ -1,5 +1,27 @@
 #!/bin/bash
 
+##! VARIABLES
+# Ajout des variables de couleur
+# Couleurs de police
+black_ft='\e[30m]'
+red_ft='\e[31m'
+green_ft='\e[32m'
+yellow_ft='\e[33m'
+blue_ft='\e[34m'
+purple_ft='\e[35m'
+cyan_ft='\e[36m'
+grey_ft='\e[37m'
+# Couleurs de fond
+black_bg='\e[40m]'
+red_bg='\e[41m'
+green_bg='\e[42m'
+yellow_bg='\e[43m'
+blue_bg='\e[44m'
+purple_bg='\e[45m'
+cyan_bg='\e[46m'
+grey_bg='\e[47m'
+# couleur par defaut
+clear='\e[0m'
 ##! FONCTIONS PERSONNALISEES
 # vérifier la présence des fichiers, les créer si besoin
 check_files()
@@ -17,13 +39,13 @@ pause(){
 show_folder()
 {
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	echo -e "\033[1m⬇️  Dossiers à sauvegarder\033[0m"
+	echo -e "⬇️ $cyan_ft Dossiers à sauvegarder $clear"
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	if [ -s folder.list ]
 	then
 		cat folder.list
 	else
-		echo "Aucune source définie"
+		echo -e "Aucune$red_ft source$clear définie "
 	fi
 }
 
@@ -31,7 +53,7 @@ show_folder()
 show_destination()
 {
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	echo -e "\033[1m⬇️  Destination de la sauvegarde\033[0m"
+	echo -e "⬇️  $red_ft Destination de la sauvegarde $clear"
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	if [ -s destination.list ]
 	then
@@ -46,7 +68,7 @@ show_menu()
 {	
 	echo; echo
 	echo -n "          "
-	echo -e '\E[37;44m'"\033[1m              Menu Principal            \033[0m"
+	echo -e "$blue_bg $red_ft             Menu Principal            $clear"
 	echo; echo
 	echo -en '\E[67;33m'"\033[1m1) Ajouter une source de sauvegarde\033[0m"
 	echo; echo
@@ -118,7 +140,7 @@ del_source()
 			if [ $? -ne 0 ] 
 			then
 				echo; echo
-				echo -en '\E[67;31m'"\033[1mErreur lors de la supression du dossier $source1\033[0m"
+				echo -en "\E[67;31mErreur lors de la supression du dossier $source1\033[0m"
 				echo; echo
 				pause
 
