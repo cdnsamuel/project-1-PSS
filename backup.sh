@@ -41,6 +41,20 @@ show_destination()
 	fi
 }
 
+# Option 4:
+show_cron()
+{
+	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+	echo "⬇️  Tache Cron En Cours"
+	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+	if [ -s cron.list ]
+	then
+		cat cron.list
+	else
+		echo "Aucune Sauvegarde planifiée"
+	fi
+}
+
 # Afficher le menu 
 show_menu()
 {	
@@ -167,23 +181,54 @@ edit_cron()
 
     if [ "$frequency" != "quotidien" ] && [ "$frequency" != "hebdomadaire" ]; then
         echo "Erreur : Fréquence invalide. Choisissez 'quotidien' ou 'hebdomadaire'."
-        return
+        pause
     fi
 
-    echo "Veuillez spécifier l'heure de la sauvegarde (format 24 heures, ex. 02:30) :"
+    echo "Veuillez spécifier l'heure de la sauvegarde (En format 24 heures, ex. 02:30) :"
     read cron_time
+cron_command="$cron_time * *"
 
-    cron_command="$cron_time * *"
     if [ "$frequency" == "quotidien" ]; then
         cron_command="$cron_command *"
     elif [ "$frequency" == "hebdomadaire" ]; then
-        echo "Veuillez spécifier le jour de la semaine pour la sauvegarde (0-6, où 0=dimanche, 1=lundi, ..., 6=samedi) :"
+        echo "Veuillez spécifier le jour de la semaine pour la sauvegarde (de 0 a 7) 
+		0 = dimanche
+		1 = lundi
+		2 = mardi
+		3 = mercredi
+		4 = jeudi
+		5 = vendredi
+		6 = samedi
+		7 = dimanche"
         read day_of_week
         cron_command="$cron_command $day_of_week"
+		pause
     fi
 
-    (crontab -l ; echo "$cron_command $0 backup_now") | crontab -
+	echo "Vous avez plannifié la frequence maintenant veuillez ajouter la source à sauvegarder"
+	pause
+	read -p "Entrez le chemin à ajouter : " new_source
+	if [ -d $new_source ]
+	then
+		read -p "Voulez vous rajouter $new_source à vos dossier à sauvegarder : Y/N " validation
+		case $validation in
+		[Yy]* )
+			echo "$new_source" >> cron.list
+			echo "Le dossier $new_source à bien été ajouté"
+			pause
+		;;
+		* )
+			echo "Le dossier $new_source n'a pas été ajouté"
+			pause
+		esac
+	else
+		echo "$new_source n'est pas un dossier"
+		pause
+	fi
+
+    (crontab -l ; echo "$cron_command $sauvegarde backup_now") | crontab -
     echo "Tâche cron ajoutée avec succès."
+	pause
 }
 
 # Lire la sélection
@@ -209,6 +254,7 @@ do
 	clear
 	show_folder
 	show_destination
+	show_cron
 	show_menu
 	read_option	
 done
