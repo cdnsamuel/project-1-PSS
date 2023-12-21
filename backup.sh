@@ -1,5 +1,27 @@
 #!/bin/bash
 
+##! VARIABLES
+# Ajout des variables de couleur
+# Couleurs de police
+black_ft='\e[30m]'
+red_ft='\e[31m'
+green_ft='\e[32m'
+yellow_ft='\e[33m'
+blue_ft='\e[34m'
+purple_ft='\e[35m'
+cyan_ft='\e[36m'
+grey_ft='\e[37m'
+# Couleurs de fond
+black_bg='\e[40m]'
+red_bg='\e[41m'
+green_bg='\e[42m'
+yellow_bg='\e[43m'
+blue_bg='\e[44m'
+purple_bg='\e[45m'
+cyan_bg='\e[46m'
+grey_bg='\e[47m'
+# couleur par defaut
+clear='\e[0m'
 ##! FONCTIONS PERSONNALISEES
 # vérifier la présence des fichiers, les créer si besoin
 check_files()
@@ -17,13 +39,13 @@ pause(){
 show_folder()
 {
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	echo "⬇️  Dossiers à sauvegarder"
+	echo -e "⬇️ $cyan_ft Dossiers à sauvegarder $clear"
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	if [ -s folder.list ]
 	then
 		cat folder.list
 	else
-		echo "Aucune source définie"
+		echo -e "Aucune$red_ft source$clear définie "
 	fi
 }
 
@@ -31,7 +53,7 @@ show_folder()
 show_destination()
 {
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	echo "⬇️  Destination de la sauvegarde"
+	echo -e "⬇️  $red_ft Destination de la sauvegarde $clear"
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	if [ -s destination.list ]
 	then
@@ -44,15 +66,23 @@ show_destination()
 # Afficher le menu 
 show_menu()
 {	
-	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	echo "🎛️  Menu Principal"
-	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	echo "1) Ajouter une source de sauvegarde"
-	echo "2) Supprimer une source de sauvegarde"
-	echo "3) Modifier la destination de sauvegarde"
-	echo "4) Lancer la sauvegarde "
-	echo "5) Plannifier la sauvegarde"
-	echo "6) Quitter"
+	echo; echo
+	echo -n "          "
+	echo -e "$blue_bg $red_ft             Menu Principal            $clear"
+	echo; echo
+	echo -en '\E[67;33m'"\033[1m1) Ajouter une source de sauvegarde\033[0m"
+	echo; echo
+	echo -en '\E[67;36m'"\033[1m2) Supprimer une source de sauvegarde\033[0m"
+	echo; echo
+	echo -en '\E[67;35m'"\033[1m3) Modifier la destination de sauvegarde\033[0m"
+	echo; echo
+	echo -en '\E[67;37m'"\033[1m4) Lancer la sauvegarde\033[0m"
+	echo; echo
+	echo -en '\E[67;32m'"\033[1m5) Plannifier la sauvegarde\033[0m"
+	echo; echo
+	echo -en '\E[67;39m'"\033[1m6) Quitter\033[0m"
+	echo; echo
+	
 	
 }
 
@@ -72,11 +102,13 @@ add_source()
 			pause
 		;;
 		* )
-			echo "Le dossier $new_source n'a pas été ajouté"
+			echo; echo
+			echo -en '\E[47;31m'"\033[1mLe dossier $new_source n'a pas été ajouté1\033[0m"
+			echo; echo
 			pause
 		esac
 	else
-		echo "$new_source n'est pas un dossier"
+		echo -e "\033[1m$new_source n'est pas un dossier\033[0m"
 		pause
 	fi
 }
@@ -145,7 +177,9 @@ edit_destination()
 
 	if [ -z "$new_destination" ]
 	then
-		echo "Suppression de la destination de sauvegarde"
+		echo; echo
+		echo -en '\E[47;32m'"\033[1mSuppression de la destination de sauvegarde\033[0m"
+		echo; echo
 		cp /dev/null destination.list
 		pause
 	else
@@ -160,18 +194,25 @@ edit_destination()
 				pause
 			;;
 			* )
-				echo "Le dossier $new_destination n'a pas été ajouté"
+				echo; echo
+				echo -en '\E[47;31m'"\033[1mLe dossier $new_destination n'a pas été ajouté\033[0m"
+				echo; echo
+				#echo "Le dossier $new_destination n'a pas été ajouté"
 				pause
 			esac
 		else	
 			read -p " Le dossier n'existe pas, voulez-vous le créer : y/n " test
 			if [ "$test" = "y" ] || [ "$test" = "Y" ]; then
 				mkdir -p "$new_destination"
-				echo " le dossier est créé "
+				echo; echo
+				echo -en '\E[47;32m'"\033[1mle dossier est créé \033[0m"
+				echo; echo
 				echo "$new_destination" > destination.list
 				pause
 			else
-				echo "Annulation, $new_destination n'est pas un dossier"
+				echo; echo
+				echo -en '\E[47;31m'"\033[1mAnnulation, $new_destination n'est pas un dossier \033[0m"
+				echo; echo
 				pause
 			fi
 
