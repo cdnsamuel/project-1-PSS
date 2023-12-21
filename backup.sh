@@ -63,6 +63,20 @@ show_destination()
 	fi
 }
 
+# Option 4:
+show_cron()
+{
+	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+	echo "⬇️  Planification"
+	crontab -l 1>/dev/null 2>&1 
+	if (( $? == 0 ))
+	then 
+		crontab -l
+	else
+		echo "Aucune tâche planifiée"
+	fi
+}
+
 # Afficher le menu 
 show_menu()
 {	
@@ -261,7 +275,88 @@ launch_backup()
 # Changer la plannification
 edit_cron()
 {
-	echo "édition de la planification"
+
+	PS3="Choisissez une option : "
+	select option in "Quotidien" "Hebdomadaire" "Annuler"
+	do
+		if [ "$REPLY" = 3 ]
+		then
+			echo "Annulation de la planification"
+			pause
+			break
+		elif [ "$REPLY" = 2 ]
+		then
+			PS3="Choisissez un jour de la semaine - [ 1 - 7 ] : "
+			select day in "Lundi" "Mardi" "Mercredi" "Jeudi" "Vendredi" "Samedi" "Dimanche"
+			do
+				case $REPLY in
+				1)
+					cron_dow=1 
+					echo "Vous avez sélectionné $day"
+					break;;
+				2)
+					cron_dow=2 
+					echo "Vous avez sélectionné $day"
+					break
+					;;
+				3)
+					cron_dow=3
+					echo "Vous avez sélectionné $day"
+					break;;
+				4)
+					cron_dow=4
+					echo "Vous avez sélectionné $day"
+					break;;
+				5)
+					cron_dow=5
+					echo "Vous avez sélectionné $day"
+					break;;
+				6)
+					cron_dow=6
+					echo "Vous avez sélectionné $day" 
+					break;;
+				7)
+					cron_dow=0
+					echo "Vous avez sélectionné $day" 
+					break;;
+				*)
+					echo "Selection invalide" ;;
+				esac
+			done
+			break
+		elif [ "$REPLY" = 1 ]
+		then
+			cron_dow=*
+			echo "Vous avez sélectionné Quotidien"
+			break;
+		else
+			echo "Choix invalide"
+			pause
+			break
+		fi
+	done
+	while true
+	do
+	echo "Veuillez spécifier l'heure de la sauvegarde ( hh:mm, ex. 14:30 ) : " 
+	read cron_time
+	if [[ $cron_time =~ ^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$ ]]
+	then
+		cron_hour=$(echo $cron_time | cut -d':' -f 1 )
+		cron_minute=$(echo $cron_time | cut -d':' -f 2 )
+		break
+	else
+		echo -e "{$red_ft}Entrée invalide$clear"
+	fi
+	done
+	echo "Sauvegarde programmée $cron_dow à $cron_hour:$cron_minute"
+	(crontab -l 2>&1 | echo "$cron_minute $cron_hour * * $cron_dow $(realpath $(basename "$0")) auto >> $(realpath .)/cron.log") | crontab -
+	pause
+}
+
+# Commande executée lors du cron
+launch_cron_backup()
+{
+	echo "cron backup"
 }
 
 # Lire la sélection
@@ -274,7 +369,8 @@ read_option()
 		3) edit_destination ;;
 		4) launch_backup ;;
 		5) edit_cron ;;
-		6) echo "Arret du script de sauvegarde" ; exit 0 ;;
+		6) echo "Suppression des tâches programmées"; crontab -r; pause ;;
+		7) echo "Arret de script" ; exit 0 ;;
 		*) echo "Selection invalide"; pause
 	esac
 }
@@ -282,11 +378,19 @@ read_option()
 ##! SCRIPT
 check_files
 
-while true
-do
-	clear
-	show_folder
-	show_destination
-	show_menu
-	read_option	
-done
+if [ $# == 1 -a $1 == "auto" ]
+then
+	echo "$(realpath $(basename "$0"))"
+	launch_cron_backup
+else
+	while true
+	do
+		clear
+		show_folder
+		show_destination
+		show_cron
+		show_menu
+		read_option	
+	done
+fi
+
