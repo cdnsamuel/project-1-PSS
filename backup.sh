@@ -18,7 +18,6 @@ show_folder()
 {
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	echo "⬇️  Dossiers à sauvegarder"
-	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	if [ -s folder.list ]
 	then
 		cat folder.list
@@ -32,7 +31,6 @@ show_destination()
 {
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	echo "⬇️  Destination de la sauvegarde"
-	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	if [ -s destination.list ]
 	then
 		cat destination.list
@@ -45,13 +43,13 @@ show_destination()
 show_cron()
 {
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	echo "⬇️  Tache Cron En Cours"
-	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	if [ -s cron.list ]
-	then
-		cat cron.list
+	echo "⬇️  Planification"
+	crontab -l 1>/dev/null 2>&1 
+	if (( $? == 0 ))
+	then 
+		crontab -l
 	else
-		echo "Aucune Sauvegarde planifiée"
+		echo "Aucune tâche planifiée"
 	fi
 }
 
@@ -66,7 +64,8 @@ show_menu()
 	echo "3) Modifier la destination de sauvegarde"
 	echo "4) Lancer la sauvegarde "
 	echo "5) Plannifier la sauvegarde"
-	echo "6) Quitter"
+	echo "6) Supprimer les planifications"
+	echo "7) Quitter"
 	
 }
 
@@ -176,59 +175,87 @@ launch_backup()
 edit_cron()
 {
 
-    echo "Veuillez spécifier la fréquence des sauvegardes (quotidien/hebdomadaire) :"
-    read frequency
-
-    if [ "$frequency" != "quotidien" ] && [ "$frequency" != "hebdomadaire" ]; then
-        echo "Erreur : Fréquence invalide. Choisissez 'quotidien' ou 'hebdomadaire'."
-        pause
-    fi
-
-    echo "Veuillez spécifier l'heure de la sauvegarde (En format 24 heures, ex. 02:30) :"
-    read cron_time
-cron_command="$cron_time * *"
-
-    if [ "$frequency" == "quotidien" ]; then
-        cron_command="$cron_command *"
-    elif [ "$frequency" == "hebdomadaire" ]; then
-        echo "Veuillez spécifier le jour de la semaine pour la sauvegarde (de 0 a 7) 
-		0 = dimanche
-		1 = lundi
-		2 = mardi
-		3 = mercredi
-		4 = jeudi
-		5 = vendredi
-		6 = samedi
-		7 = dimanche"
-        read day_of_week
-        cron_command="$cron_command $day_of_week"
-		pause
-    fi
-
-	echo "Vous avez plannifié la frequence maintenant veuillez ajouter la source à sauvegarder"
-	pause
-	read -p "Entrez le chemin à ajouter : " new_source
-	if [ -d $new_source ]
+	PS3="Choisissez une option : "
+	select option in "Quotidien" "Hebdomadaire" "Annuler"
+	do
+		if [ "$REPLY" = 3 ]
+		then
+			echo "Annulation de la planification"
+			pause
+			break
+		elif [ "$REPLY" = 2 ]
+		then
+			PS3="Choisissez un jour de la semaine - [ 1 - 7 ] : "
+			select day in "Lundi" "Mardi" "Mercredi" "Jeudi" "Vendredi" "Samedi" "Dimanche"
+			do
+				case $REPLY in
+				1)
+					cron_dow=1 
+					echo "Vous avez sélectionné $day"
+					break;;
+				2)
+					cron_dow=2 
+					echo "Vous avez sélectionné $day"
+					break
+					;;
+				3)
+					cron_dow=3
+					echo "Vous avez sélectionné $day"
+					break;;
+				4)
+					cron_dow=4
+					echo "Vous avez sélectionné $day"
+					break;;
+				5)
+					cron_dow=5
+					echo "Vous avez sélectionné $day"
+					break;;
+				6)
+					cron_dow=6
+					echo "Vous avez sélectionné $day" 
+					break;;
+				7)
+					cron_dow=0
+					echo "Vous avez sélectionné $day" 
+					break;;
+				*)
+					echo "Selection invalide" ;;
+				esac
+			done
+			break
+		elif [ "$REPLY" = 1 ]
+		then
+			cron_dow=*
+			echo "Vous avez sélectionné Quotidien"
+			break;
+		else
+			echo "Choix invalide"
+			pause
+			break
+		fi
+	done
+	while true
+	do
+	echo "Veuillez spécifier l'heure de la sauvegarde ( hh:mm, ex. 14:30 ) : " 
+	read cron_time
+	if [[ $cron_time =~ ^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$ ]]
 	then
-		read -p "Voulez vous rajouter $new_source à vos dossier à sauvegarder : Y/N " validation
-		case $validation in
-		[Yy]* )
-			echo "$new_source" >> cron.list
-			echo "Le dossier $new_source à bien été ajouté"
-			pause
-		;;
-		* )
-			echo "Le dossier $new_source n'a pas été ajouté"
-			pause
-		esac
+		cron_hour=$(echo $cron_time | cut -d':' -f 1 )
+		cron_minute=$(echo $cron_time | cut -d':' -f 2 )
+		break
 	else
-		echo "$new_source n'est pas un dossier"
-		pause
+		echo -e "{$red_ft}Entrée invalide$clear"
 	fi
-
-    (crontab -l ; echo "$cron_command $sauvegarde backup_now") | crontab -
-    echo "Tâche cron ajoutée avec succès."
+	done
+	echo "Sauvegarde programmée $cron_dow à $cron_hour:$cron_minute"
+	(crontab -l 2>&1 | echo "$cron_minute $cron_hour * * $cron_dow $(realpath $(basename "$0")) auto >> $(realpath .)/cron.log") | crontab -
 	pause
+}
+
+# Commande executée lors du cron
+launch_cron_backup()
+{
+	echo "cron backup"
 }
 
 # Lire la sélection
@@ -241,7 +268,8 @@ read_option()
 		3) edit_destination ;;
 		4) launch_backup ;;
 		5) edit_cron ;;
-		6) echo "Arret de script" ; exit 0 ;;
+		6) echo "Suppression des tâches programmées"; crontab -r; pause ;;
+		7) echo "Arret de script" ; exit 0 ;;
 		*) echo "Selection invalide"; pause
 	esac
 }
@@ -249,12 +277,19 @@ read_option()
 ##! SCRIPT
 check_files
 
-while true
-do
-	clear
-	show_folder
-	show_destination
-	show_cron
-	show_menu
-	read_option	
-done
+if [ $# == 1 -a $1 == "auto" ]
+then
+	echo "$(realpath $(basename "$0"))"
+	launch_cron_backup
+else
+	while true
+	do
+		clear
+		show_folder
+		show_destination
+		show_cron
+		show_menu
+		read_option	
+	done
+fi
+
