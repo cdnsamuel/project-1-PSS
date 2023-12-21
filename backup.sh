@@ -70,17 +70,17 @@ show_menu()
 	echo -n "          "
 	echo -e "$blue_bg $red_ft             Menu Principal            $clear"
 	echo; echo
-	echo -en '\E[67;33m'"\033[1m1) Ajouter une source de sauvegarde\033[0m"
+	echo -en "$yellow_ft 1) Ajouter une source de sauvegarde $clear"
 	echo; echo
-	echo -en '\E[67;36m'"\033[1m2) Supprimer une source de sauvegarde\033[0m"
+	echo -en "$cyan_ft 2) Supprimer une source de sauvegarde $clear"
 	echo; echo
-	echo -en '\E[67;35m'"\033[1m3) Modifier la destination de sauvegarde\033[0m"
+	echo -en "$purple_ft 3) Modifier la destination de sauvegarde $clear"
 	echo; echo
-	echo -en '\E[67;37m'"\033[1m4) Lancer la sauvegarde\033[0m"
+	echo -en "$grey_ft 4) Lancer la sauvegarde $clear"
 	echo; echo
-	echo -en '\E[67;32m'"\033[1m5) Plannifier la sauvegarde\033[0m"
+	echo -en "$green_ft 5) Plannifier la sauvegarde $clear"
 	echo; echo
-	echo -en '\E[67;39m'"\033[1m6) Quitter\033[0m"
+	echo -en "$black_ft 6) Quitter $clear"
 	echo; echo
 	
 	
@@ -90,30 +90,30 @@ show_menu()
 add_source()
 {	
 	echo; echo
-	echo -en '\E[67;33m'"\033[1mAjout de source sélectionné\033[0m"
+	echo -en "$yellow_ft Ajout de source sélectionné $clear"
 	echo; echo
 	
 	pause
 	read -p "Entrez le chemin à ajouter : " new_source
 	if [ -d $new_source ]
 	then
-		read -p "Voulez vous rajouter $new_source à vos dossier à sauvegarder : Y/N " validation
+		read -p " Voulez vous rajouter  $new_source à vos dossier à sauvegarder : Y/N " validation
 		case $validation in
 		[Yy]* )
 			echo "$new_source" >> folder.list
 			echo; echo
-			echo -en '\E[47;32m'"\033[1mLe dossier $new_source à bien été ajouté1\033[0m"
+			echo -en " $green_bg Le dossier $new_source à bien été ajouté $clear"
 			echo; echo
 			pause
 		;;
 		* )
 			echo; echo
-			echo -en '\E[47;31m'"\033[1mLe dossier $new_source n'a pas été ajouté1\033[0m"
+			echo -en "$red_bg Le dossier $new_source n'a pas été ajouté $clear"
 			echo; echo
 			pause
 		esac
 	else
-		echo -e "\033[1m$new_source n'est pas un dossier\033[0m"
+		echo -e "$red_ft $new_source n'est pas un dossier $clear"
 		pause
 	fi
 }
@@ -122,7 +122,7 @@ add_source()
 del_source()
 {
 	echo; echo
-	echo -en '\E[67;36m'"\033[1mSuppression de source sélectionné\033[0m"
+	echo -en "$cyan_ft Suppression de source sélectionné $clear"
 	echo; echo
 	pause
 	read -p "Entrez le chemin à enlever : " source
@@ -140,26 +140,26 @@ del_source()
 			if [ $? -ne 0 ] 
 			then
 				echo; echo
-				echo -en "\E[67;31mErreur lors de la supression du dossier $source1\033[0m"
+				echo -en "$red_ft Erreur lors de la supression du dossier $source $clear"
 				echo; echo
 				pause
 
 			else
 				echo; echo
-				echo -en '\E[47;32m'"\033[1mLe dossier $source à bien été enlevé1\033[0m"
+				echo -en "$green_ft Le dossier $source à bien été enlevé $clear"
 				echo; echo
 				pause
 			fi
 		;;
 		* )
 			echo; echo
-			echo -en '\E[47;31m'"\033[1mAnnulation, Le dossier $source n'a pas été enlevé1\033[0m"
+			echo -en "$red_ft annulation, Le dossier $source n'a pas été enlevé $clear"
 			echo; echo
 			pause
 		esac
 	else
 		echo; echo
-		echo -en '\E[67;31m'"\033[1m$source n'est pas dans la liste des sources de sauvegardes\033[0m"
+		echo -en "$red_ft $source n'est pas dans la liste des sources de sauvegardes $clear"
 		echo; echo
 		
 		pause
@@ -168,8 +168,9 @@ del_source()
 
 # Editer la destination de sauvegarde
 edit_destination()
-{
-	echo "Ajout de la destination"
+{	echo; echo
+	echo -en "$purple_ft Ajout de la destination $clear"
+	echo; echo
 	pause
 	echo  "Entrez le chemin de la destination"
 	read -p "(Pour supprimer valider sans entrer de valeur) : " new_destination
@@ -177,7 +178,7 @@ edit_destination()
 	if [ -z "$new_destination" ]
 	then
 		echo; echo
-		echo -en '\E[47;32m'"\033[1mSuppression de la destination de sauvegarde\033[0m"
+		echo -en "$green_bg Suppression de la destination de sauvegarde $clear"
 		echo; echo
 		cp /dev/null destination.list
 		pause
@@ -189,16 +190,14 @@ edit_destination()
 			[Yy]* )
 				echo "$new_destination" > destination.list
 				echo; echo
-				echo -en '\E[47;32m'"\033[1mLe dossier $new_destination à bien été ajouté\033[0m"
+				echo -en "$green_ft Le dossier $new_destination à bien été ajouté $clear"
 				echo; echo
-				#echo "Le dossier $new_destination à bien été ajouté"
 				pause
 			;;
 			* )
 				echo; echo
-				echo -en '\E[47;31m'"\033[1mLe dossier $new_destination n'a pas été ajouté\033[0m"
+				echo -en "$red_ft Le dossier $new_destination n'a pas été ajouté $clear"
 				echo; echo
-				#echo "Le dossier $new_destination n'a pas été ajouté"
 				pause
 			esac
 		else	
@@ -206,13 +205,13 @@ edit_destination()
 			if [ "$test" = "y" ] || [ "$test" = "Y" ]; then
 				mkdir -p "$new_destination"
 				echo; echo
-				echo -en '\E[47;32m'"\033[1mle dossier est créé \033[0m"
+				echo -en "$green_bg le dossier est créé $clear"
 				echo; echo
 				echo "$new_destination" > destination.list
 				pause
 			else
 				echo; echo
-				echo -en '\E[47;31m'"\033[1mAnnulation, $new_destination n'est pas un dossier \033[0m"
+				echo -en "$red_bg Annulation, $new_destination n'est pas un dossier $clear"
 				echo; echo
 				pause
 			fi
@@ -228,12 +227,12 @@ launch_backup()
 	if [ -s folder.list -a -s destination.list ]
 	then
 		echo; echo
-		echo -en '\E[67;37m'"\033[1mDébut de la sauvegarde\033[0m"
+		echo -en "$grey_ft Début de la sauvegarde $clear"
 		echo; echo
 		pause
 	else
-		if [ ! -s folder.list ]; then echo "Aucune source définie"; fi
-		if [ ! -s destination.list ]; then echo "Aucune destination définie"; fi
+		if [ ! -s folder.list ]; then echo -en "$red_ft Aucune source définie $clear"; fi
+		if [ ! -s destination.list ]; then echo "$red_ft Aucune destination définie $clear"; fi
 		pause
 	fi
 }
