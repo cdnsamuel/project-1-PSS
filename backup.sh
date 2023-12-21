@@ -17,7 +17,7 @@ pause(){
 show_folder()
 {
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	echo "⬇️  Dossiers à sauvegarder"
+	echo -e "\033[1m⬇️  Dossiers à sauvegarder\033[0m"
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	if [ -s folder.list ]
 	then
@@ -31,7 +31,7 @@ show_folder()
 show_destination()
 {
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	echo "⬇️  Destination de la sauvegarde"
+	echo -e "\033[1m⬇️  Destination de la sauvegarde\033[0m"
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	if [ -s destination.list ]
 	then
@@ -44,38 +44,32 @@ show_destination()
 # Afficher le menu 
 show_menu()
 {	
-	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+	echo; echo
 	echo -n "          "
 	echo -e '\E[37;44m'"\033[1m              Menu Principal            \033[0m"
-	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	echo; echo
-	echo -en '\E[67;34m'"\033[1m1) Ajouter une source de sauvegarde\033[0m"
+	echo -en '\E[67;33m'"\033[1m1) Ajouter une source de sauvegarde\033[0m"
 	echo; echo
 	echo -en '\E[67;36m'"\033[1m2) Supprimer une source de sauvegarde\033[0m"
 	echo; echo
-	echo -en '\E[67;34m'"\033[1m3) Modifier la destination de sauvegarde\033[0m"
+	echo -en '\E[67;35m'"\033[1m3) Modifier la destination de sauvegarde\033[0m"
 	echo; echo
-	echo -en '\E[67;34m'"\033[1m4) Lancer la sauvegarde\033[0m"
+	echo -en '\E[67;37m'"\033[1m4) Lancer la sauvegarde\033[0m"
 	echo; echo
-	echo -en '\E[67;34m'"\033[1m5) Plannifier la sauvegarde\033[0m"
+	echo -en '\E[67;32m'"\033[1m5) Plannifier la sauvegarde\033[0m"
 	echo; echo
-	echo -en '\E[67;34m'"\033[1m6) Quitter\033[0m"
+	echo -en '\E[67;39m'"\033[1m6) Quitter\033[0m"
 	echo; echo
 	
-	#echo "1) Ajouter une source de sauvegarde"
-	
-	#echo "2) Supprimer une source de sauvegarde"
-	#echo "3) Modifier la destination de sauvegarde"
-	#echo "4) Lancer la sauvegarde "
-	#echo "5) Plannifier la sauvegarde"
-	#echo "6) Quitter"
 	
 }
 
 # Ajouter une entrée à folder.list
 add_source()
 {	
-	echo "Ajout de source sélectionné"
+	echo; echo
+	echo -en '\E[67;33m'"\033[1mAjout de source sélectionné\033[0m"
+	echo; echo
 	
 	pause
 	read -p "Entrez le chemin à ajouter : " new_source
@@ -85,15 +79,19 @@ add_source()
 		case $validation in
 		[Yy]* )
 			echo "$new_source" >> folder.list
-			echo "Le dossier $new_source à bien été ajouté"
+			echo; echo
+			echo -en '\E[47;32m'"\033[1mLe dossier $new_source à bien été ajouté1\033[0m"
+			echo; echo
 			pause
 		;;
 		* )
-			echo "Le dossier $new_source n'a pas été ajouté"
+			echo; echo
+			echo -en '\E[47;31m'"\033[1mLe dossier $new_source n'a pas été ajouté1\033[0m"
+			echo; echo
 			pause
 		esac
 	else
-		echo "$new_source n'est pas un dossier"
+		echo -e "\033[1m$new_source n'est pas un dossier\033[0m"
 		pause
 	fi
 }
@@ -101,7 +99,9 @@ add_source()
 # Supprimer une entrée à folder.list
 del_source()
 {
-	echo "Suppression de source sélectionné"
+	echo; echo
+	echo -en '\E[67;36m'"\033[1mSuppression de source sélectionné\033[0m"
+	echo; echo
 	pause
 	read -p "Entrez le chemin à enlever : " source
 	if grep -q "$source$" folder.list
@@ -117,20 +117,29 @@ del_source()
 			fi
 			if [ $? -ne 0 ] 
 			then
-				echo "Erreur lors de la supression du dossier $source"
+				echo; echo
+				echo -en '\E[67;31m'"\033[1mErreur lors de la supression du dossier $source1\033[0m"
+				echo; echo
 				pause
 
 			else
-				echo "Le dossier $source à bien été enlevé"
+				echo; echo
+				echo -en '\E[47;32m'"\033[1mLe dossier $source à bien été enlevé1\033[0m"
+				echo; echo
 				pause
 			fi
 		;;
 		* )
-			echo "Annulation, Le dossier $source n'a pas été enlevé"
+			echo; echo
+			echo -en '\E[47;31m'"\033[1mAnnulation, Le dossier $source n'a pas été enlevé1\033[0m"
+			echo; echo
 			pause
 		esac
 	else
-		echo "$source n'est pas dans la liste des sources de sauvegardes"
+		echo; echo
+		echo -en '\E[67;31m'"\033[1m$source n'est pas dans la liste des sources de sauvegardes\033[0m"
+		echo; echo
+		
 		pause
 	fi
 }
@@ -145,7 +154,9 @@ edit_destination()
 
 	if [ -z "$new_destination" ]
 	then
-		echo "Suppression de la destination de sauvegarde"
+		echo; echo
+		echo -en '\E[47;32m'"\033[1mSuppression de la destination de sauvegarde\033[0m"
+		echo; echo
 		cp /dev/null destination.list
 		pause
 	else
@@ -155,22 +166,32 @@ edit_destination()
 			case $validation in
 			[Yy]* )
 				echo "$new_destination" > destination.list
-				echo "Le dossier $new_destination à bien été ajouté"
+				echo; echo
+				echo -en '\E[47;32m'"\033[1mLe dossier $new_destination à bien été ajouté\033[0m"
+				echo; echo
+				#echo "Le dossier $new_destination à bien été ajouté"
 				pause
 			;;
 			* )
-				echo "Le dossier $new_destination n'a pas été ajouté"
+				echo; echo
+				echo -en '\E[47;31m'"\033[1mLe dossier $new_destination n'a pas été ajouté\033[0m"
+				echo; echo
+				#echo "Le dossier $new_destination n'a pas été ajouté"
 				pause
 			esac
 		else	
 			read -p " Le dossier n'existe pas, voulez-vous le créer : y/n " test
 			if [ "$test" = "y" ] || [ "$test" = "Y" ]; then
 				mkdir -p "$new_destination"
-				echo " le dossier est créé "
+				echo; echo
+				echo -en '\E[47;32m'"\033[1mle dossier est créé \033[0m"
+				echo; echo
 				echo "$new_destination" > destination.list
 				pause
 			else
-				echo "Annulation, $new_destination n'est pas un dossier"
+				echo; echo
+				echo -en '\E[47;31m'"\033[1mAnnulation, $new_destination n'est pas un dossier \033[0m"
+				echo; echo
 				pause
 			fi
 
@@ -184,7 +205,9 @@ launch_backup()
 {	
 	if [ -s folder.list -a -s destination.list ]
 	then
-		echo "Début de la sauvegarde"
+		echo; echo
+		echo -en '\E[67;37m'"\033[1mDébut de la sauvegarde\033[0m"
+		echo; echo
 		pause
 	else
 		if [ ! -s folder.list ]; then echo "Aucune source définie"; fi
