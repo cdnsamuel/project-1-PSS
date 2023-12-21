@@ -1,3 +1,8 @@
-# Liste des dossiers de test
+# Liste des dossiers de test source
 sam
 test
+
+# Liste des dossiers de test destination
+BKP-*
+
+# Autres
