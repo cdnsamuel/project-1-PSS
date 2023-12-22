@@ -22,6 +22,7 @@ cyan_bg='\e[46m'
 grey_bg='\e[47m'
 # couleur par defaut
 clear='\e[0m'
+
 ##! FONCTIONS PERSONNALISEES
 # vérifier la présence des fichiers, les créer si besoin
 check_files()
@@ -32,97 +33,95 @@ check_files()
 
 # demander confirmation avant execution
 pause(){
-  read -p "Appuyez sur la touche [Entrée] pour continuer..." fackEnterKey
+  printf "${cyan_ft}Appuyez sur la touche${yellow_ft} [Entrée] ${cyan_ft}pour continuer...${clear}"
+  read fackEnterKey
 }
 
 # Afficher la liste des cibles
 show_folder()
 {
-	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	echo -e "⬇️ $cyan_ft Dossiers à sauvegarder $clear"
-	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+	echo -e "${cyan_ft}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+	echo -e "▶️  Dossiers à sauvegarder${cyan_ft}"
 	if [ -s folder.list ]
 	then
-		cat folder.list
+		for line in $(cat folder.list)
+		do
+			echo -e "${cyan_ft}▶️  $line${clear}"
+		done
 	else
-		echo -e "Aucune$red_ft source$clear définie "
+		echo -e ${red_ft}"❌  Aucune source définie${clear}"
 	fi
 }
 
 # Option 3:
 show_destination()
 {
-	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	echo -e "⬇️  $red_ft Destination de la sauvegarde $clear"
-	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+	echo -e  "${green_ft}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+	echo -e "✅ Destination de la sauvegarde${clear}"
 	if [ -s destination.list ]
 	then
-		cat destination.list
+		for line in $(cat destination.list)
+		do
+			echo -e "${green_ft}✅ $line${clear}"
+		done
 	else
-		echo "Aucune destination définie"
+		echo -e "${red_ft}❌  Aucune destination définie${clear}"
 	fi
 }
 
 # Option 4:
 show_cron()
 {
-	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	echo "⬇️  Planification"
+	echo -e "${yellow_ft}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+	echo -e "⏲️  Planification${clear}"
 	crontab -l 1>/dev/null 2>&1 
 	if (( $? == 0 ))
 	then 
+		echo -e ${yellow_ft}
 		crontab -l
+		echo -e ${clear}
 	else
-		echo "Aucune tâche planifiée"
+		echo -e ${red_ft}"❌  Aucune planification définie"${clear}
 	fi
 }
 
 # Afficher le menu 
 show_menu()
 {	
-	echo; echo
-	echo -n "          "
-	echo -e "$blue_bg $red_ft             Menu Principal            $clear"
-	echo; echo
-	echo -en '\E[67;33m'"\033[1m1) Ajouter une source de sauvegarde\033[0m"
-	echo; echo
-	echo -en '\E[67;36m'"\033[1m2) Supprimer une source de sauvegarde\033[0m"
-	echo; echo
-	echo -en '\E[67;35m'"\033[1m3) Modifier la destination de sauvegarde\033[0m"
-	echo; echo
-	echo -en '\E[67;37m'"\033[1m4) Lancer la sauvegarde\033[0m"
-	echo; echo
-	echo -en '\E[67;32m'"\033[1m5) Plannifier la sauvegarde\033[0m"
-	echo; echo
-	echo -en '\E[67;39m'"\033[1m6) Quitter\033[0m"
-	echo; echo
-	
-	
+	echo -e "${purple_ft}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+	echo -e "🚀 Menu Principal "
+	echo -e "1) Ajouter une source de sauvegarde"
+	echo -e "2) Supprimer une source de sauvegarde"
+	echo -e "3) Modifier la destination de sauvegarde"
+	echo -e "4) Lancer la sauvegarde"
+	echo -e "5) Plannifier la sauvegarde"
+	echo -e "6) Supprimer les plannifications${clear}"
+	echo -e ${red_ft}"7) Quitter"${clear}
 }
 
 # Ajouter une entrée à folder.list
 add_source()
 {	
-	echo "Ajout de source sélectionné"
-	read -p "Entrez le chemin à ajouter : " new_source
+	echo -e "${purple_ft}Ajout de source sélectionné${clear}"
+	printf "Entrez le chemin à ajouter : ${green_ft}" 
+	read new_source
 	if [ -d $new_source ]
 	then
-		read -p "Voulez vous rajouter $new_source à vos dossier à sauvegarder : Y/N " validation
+		printf "${clear}Voulez vous rajouter ${green_ft}$new_source${clear} à vos dossier à sauvegarder - ${yellow_ft}Y${clear}/${yellow_ft}N${clear} : "
+		read validation
 		case $validation in
 		[Yy]* )
 			absolute_new_source=$(realpath $new_source)
 			echo "$absolute_new_source" >> folder.list
-			echo "Le dossier $absolute_new_source à bien été ajouté"
+			echo -e "✅ Le dossier ${green_ft}$absolute_new_source${clear} à bien été ajouté"
 			pause
 		;;
 		* )
-			echo; echo
-			echo -en '\E[47;31m'"\033[1mLe dossier $new_source n'a pas été ajouté1\033[0m"
-			echo; echo
+			echo -e "${red_ft}❌  Le dossier ${yellow_ft}$new_source${red_ft} n'a pas été ajouté${clear}"
 			pause
 		esac
 	else
-		echo -e "\033[1m$new_source n'est pas un dossier\033[0m"
+		echo -e "❌ ${yellow_ft}$new_source ${red_ft}n'est pas un dossier${clear}"
 		pause
 	fi
 }
@@ -132,7 +131,7 @@ del_source()
 {
 	if [ -s folder.list ]
 	then
-		echo "Suppression de source sélectionné"	
+		echo -e "${purple_ft}Suppression de source sélectionné${clear}"	
 		PS3="Choisissez une option : "
 
 		items=($(cat folder.list))
@@ -141,12 +140,13 @@ del_source()
 		do
 			if [ "$REPLY" = $((${#items[@]}+1)) ]
 			then
-				echo "Annulation de la suppresion"
+				echo -e "${red_ft}❌ Annulation de la suppresion"
 				pause
 				break
 			elif (( "$REPLY" > 0 && "$REPLY" <= lines ))
 			then
-				read -p "Voulez vous enlever $item : Y/N " validation
+				printf "Voulez vous enlever ${green_ft}$item${clear} : ${yellow_ft}Y${clear}/${yellow_ft}N${clear} " 
+				read validation
 				case $validation in
 				[Yy]* )
 					if [ $(wc -l < folder.list) -eq 1 ]
@@ -157,16 +157,16 @@ del_source()
 					fi
 					if [ $? -ne 0 ] 
 					then
-						echo "Erreur lors de la supression du dossier $item"
+						echo -e "${red_ft}❌ Erreur lors de la supression du dossier $item"
 						pause
 
 					else
-						echo "Le dossier $item à bien été enlevé"
+						echo -e "✅ Le dossier ${green_ft}$item${clear} à bien été enlevé"
 						pause
 					fi
 					;;
 				* )
-					echo "Annulation, Le dossier $item n'a pas été enlevé"
+					echo -e "${red_ft}❌ Annulation, Le dossier ${yellow_ft}$item${red_ft} n'a pas été enlevé${clear}"
 					pause
 				esac
 				break
@@ -177,7 +177,7 @@ del_source()
 			fi
 		done
 	else
-		echo "Aucune source à supprimer"
+		echo -e "${red_ft}❌ Aucune source à supprimer${clear}"
 		pause
 	fi
 }
@@ -185,33 +185,30 @@ del_source()
 # Editer la destination de sauvegarde
 edit_destination()
 {
-	echo "Ajout de la destination"
+	echo -e "${purple_ft}Ajout de la destination${clear}"
 	echo  "Entrez le chemin de la destination"
-	read -p "(Pour supprimer valider sans entrer de valeur) : " new_destination
+	printf "(Pour supprimer valider sans entrer de valeur) : ${green_ft}"
+	read new_destination
 
 	if [ -z "$new_destination" ]
 	then
-		echo; echo
-		echo -en '\E[47;32m'"\033[1mSuppression de la destination de sauvegarde\033[0m"
-		echo; echo
+		echo -e "${green_ft}✅ Suppression de la destination de sauvegarde"
 		cp /dev/null destination.list
 		pause
 	else
 		if [ -d "$new_destination" ]
 		then
-			read -p "Voulez vous que $new_destination devienne votre chemin de sauvegarde : Y/N " validation
+			printf "${clear}Voulez vous que ${green_ft}$new_destination${clear} devienne votre chemin de sauvegarde : ${yellow_ft}Y${clear}/${yellow_ft}N${clear} " 
+			read validation
 			case $validation in
 			[Yy]* )
 				absolute_new_destination=$(realpath $new_destination)
 				echo "$absolute_new_destination" > destination.list
-				echo "Le dossier $absolute_new_destination à bien été ajouté"
+				echo -e "✅ Le dossier ${green_ft}$absolute_new_destination${clear} à bien été ajouté"
 				pause
 			;;
 			* )
-				echo; echo
-				echo -en '\E[47;31m'"\033[1mLe dossier $new_destination n'a pas été ajouté\033[0m"
-				echo; echo
-				#echo "Le dossier $new_destination n'a pas été ajouté"
+				echo -e "${red_ft}❌Le dossier ${yellow_font}$new_destination${red_ft} n'a pas été ajouté${clear}"
 				pause
 			esac
 		else	
@@ -238,7 +235,6 @@ edit_destination()
 # Effectuer la sauvegarde
 launch_backup()
 {	
-	echo Initialisation de la sauvegarde
 	if [ -s folder.list -a -s destination.list ]
 	then
 		conflict=0
@@ -248,7 +244,7 @@ launch_backup()
 			if [[ $absolute_destination_path == *$source* ]]
 			then
 				conflict=1
-				echo "$absolute_destination_path est dans une source veuiller modifier les chemins"
+				echo -e "❌ ${yellow_ft}$absolute_destination_path ${red_ft}est dans une source veuiller modifier les chemins${clear}"
 			fi
 		done
 
@@ -256,18 +252,18 @@ launch_backup()
 		then 
 			timestamp=$(date +%Y%m%d-%H%M%S)
 			backup_destination=$absolute_destination_path/BKP-$timestamp
-			echo "Début de la sauvegarde $timestamp"
+			echo -e "${purple_ft}Début de la sauvegarde ${yellow_ft}$timestamp${clear}"
 			mkdir $backup_destination
 			for source in $(cat folder.list)
 			do
 				folder=$(basename $source)
-				tar -czf $backup_destination/$folder.tgz $source && printf "Sauvegarde terminée\n" || printf "Erreur lors de la sauvegarde\n"
+				tar -czf $backup_destination/$folder.tgz $source && printf "${green_ft}✅ Sauvegarde terminée ${clear}\n" || printf "${red_ft}❌ Erreur lors de la sauvegarde${clear}\n"
 			done
 		fi
 		pause
 	else
-		if [ ! -s folder.list ]; then echo "Aucune source définie"; fi
-		if [ ! -s destination.list ]; then echo "Aucune destination définie"; fi
+		if [ ! -s folder.list ]; then echo -e "${red_ft}❌ Aucune source définie${clear}"; fi
+		if [ ! -s destination.list ]; then echo -e "${red_ft}❌ Aucune destination définie${clear}"; fi
 		pause
 	fi
 }
@@ -275,13 +271,13 @@ launch_backup()
 # Changer la plannification
 edit_cron()
 {
-
+	echo -e "${purple_ft}Choix de plannification${clear}"
 	PS3="Choisissez une option : "
 	select option in "Quotidien" "Hebdomadaire" "Annuler"
 	do
 		if [ "$REPLY" = 3 ]
 		then
-			echo "Annulation de la planification"
+			echo -e "${red_ft}Annulation de la planification${clear}"
 			pause
 			break
 		elif [ "$REPLY" = 2 ]
@@ -292,52 +288,52 @@ edit_cron()
 				case $REPLY in
 				1)
 					cron_dow=1 
-					echo "Vous avez sélectionné $day"
+					echo -e "Vous avez sélectionné ${green_ft}$day${clear}"
 					break;;
 				2)
 					cron_dow=2 
-					echo "Vous avez sélectionné $day"
+					echo -e "Vous avez sélectionné ${green_ft}$day${clear}"
 					break
 					;;
 				3)
 					cron_dow=3
-					echo "Vous avez sélectionné $day"
+					echo -e "Vous avez sélectionné ${green_ft}$day${clear}"
 					break;;
 				4)
 					cron_dow=4
-					echo "Vous avez sélectionné $day"
+					echo -e "Vous avez sélectionné ${green_ft}$day${clear}"
 					break;;
 				5)
 					cron_dow=5
-					echo "Vous avez sélectionné $day"
+					echo -e "Vous avez sélectionné ${green_ft}$day${clear}"
 					break;;
 				6)
 					cron_dow=6
-					echo "Vous avez sélectionné $day" 
+					echo -e "Vous avez sélectionné ${green_ft}$day${clear}"
 					break;;
 				7)
 					cron_dow=0
-					echo "Vous avez sélectionné $day" 
+					echo -e "Vous avez sélectionné ${green_ft}$day${clear}"
 					break;;
 				*)
-					echo "Selection invalide" ;;
+					echo "${red_ft}Selection invalide${clear}" ;;
 				esac
 			done
 			break
 		elif [ "$REPLY" = 1 ]
 		then
 			cron_dow=*
-			echo "Vous avez sélectionné Quotidien"
+			echo -e "Vous avez sélectionné ${green_ft}Quotidien${clear}"
 			break;
 		else
-			echo "Choix invalide"
+			echo -e "${red_ft}Choix invalide${clear}"
 			pause
 			break
 		fi
 	done
 	while true
 	do
-	echo "Veuillez spécifier l'heure de la sauvegarde ( hh:mm, ex. 14:30 ) : " 
+	echo -e "Veuillez spécifier l'heure de la sauvegarde ( ${yellow_ft}hh:mm${clear}, ex. 14:30 ) : " 
 	read cron_time
 	if [[ $cron_time =~ ^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$ ]]
 	then
@@ -345,10 +341,10 @@ edit_cron()
 		cron_minute=$(echo $cron_time | cut -d':' -f 2 )
 		break
 	else
-		echo -e "{$red_ft}Entrée invalide$clear"
+		echo -e "{${red_ft}}Entrée invalide${clear}"
 	fi
 	done
-	echo "Sauvegarde programmée $cron_dow à $cron_hour:$cron_minute"
+	echo -e "Sauvegarde programmée $cron_dow à $cron_hour:$cron_minute"
 	(crontab -l 2>&1 | echo "$cron_minute $cron_hour * * $cron_dow $(realpath $(basename "$0")) auto >> $(realpath .)/cron.log") | crontab -
 	pause
 }
@@ -362,14 +358,15 @@ launch_cron_backup()
 # Lire la sélection
 read_option()
 {
-	read -p "Choisissez une option [ 1 - 6 ]: " option
+	printf "Choisissez une option [ ${yellow_ft}1${clear} - ${yellow_ft}6${clear} ] : " 
+	read option
 	case $option in
 		1) add_source ;;
 		2) del_source ;;
 		3) edit_destination ;;
 		4) launch_backup ;;
 		5) edit_cron ;;
-		6) echo "Suppression des tâches programmées"; crontab -r; pause ;;
+		6) echo -e "${purple_ft}Suppression des tâches programmées${clear}"; crontab -r; pause ;;
 		7) echo "Arret de script" ; exit 0 ;;
 		*) echo "Selection invalide"; pause
 	esac
