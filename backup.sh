@@ -333,7 +333,7 @@ edit_cron()
 	done
 	while true
 	do
-	echo -e "Veuillez spécifier l'heure de la sauvegarde ( ${yellow_ft}hh:mm${clear}, ex. 14:30 ) : " 
+	echo -e "Veuillez spécifier l'heure de la sauvegarde ( ${yellow_ft}hh:mm${clear}, ex. 08:30 ) : " 
 	read cron_time
 	if [[ $cron_time =~ ^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$ ]]
 	then
